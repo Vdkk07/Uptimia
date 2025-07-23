@@ -1,17 +1,17 @@
 "use client";
 import React, { useState, useMemo } from "react";
-import { ChevronDown, ChevronUp, Globe, Plus, Moon, Sun } from "lucide-react";
+import { ChevronDown, ChevronUp, Globe, Plus, } from "lucide-react";
+import { useWebsites } from "../hooks/useWebsites";
 import axios from "axios";
 import { API_BACKEND_URL } from "@/config";
 import { useAuth } from "@clerk/nextjs";
-import { useWebsites } from "../hooks/useWebsites";
 
-type UptimeStatus = "Good" | "Bad" | "unknown";
+type UptimeStatus = "good" | "bad" | "unknown";
 
 function StatusCircle({ status }: { status: UptimeStatus }) {
   return (
     <div
-      className={`w-3 h-3 rounded-full ${status === "Good" ? "bg-green-500" : status === "Bad" ? "bg-red-500" : "bg-gray-500"}`}
+      className={`w-3 h-3 rounded-full ${status === "good" ? "bg-green-500" : status === "bad" ? "bg-red-500" : "bg-gray-500"}`}
     />
   );
 }
@@ -23,9 +23,9 @@ function UptimeTicks({ ticks }: { ticks: UptimeStatus[] }) {
         <div
           key={index}
           className={`w-8 h-2 rounded ${
-            tick === "Good"
+            tick === "good"
               ? "bg-green-500"
-              : tick === "Bad"
+              : tick === "bad"
                 ? "bg-red-500"
                 : "bg-gray-500"
           }`}
@@ -146,7 +146,7 @@ function App() {
   const { getToken } = useAuth();
 
   const processedWebsites = useMemo(() => {
-    return (websites ?? []).map((website) => {
+    return websites.map((website) => {
       // Sort ticks by creation time
       const sortedTicks = [...website.ticks].sort(
         (a, b) =>
@@ -179,8 +179,8 @@ function App() {
           windowTicks.length === 0
             ? "unknown"
             : upTicks / windowTicks.length >= 0.5
-              ? "Good"
-              : "Bad";
+              ? "good"
+              : "bad";
       }
 
       // Calculate overall status and uptime percentage
@@ -210,14 +210,6 @@ function App() {
     });
   }, [websites]);
 
-  // Toggle dark mode
-  React.useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [isDarkMode]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">

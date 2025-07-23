@@ -2,14 +2,16 @@ import express from "express";
 import { authMiddleware } from "./middleware";
 import { prismaClient } from "db/client";
 import cors from "cors";
+import { Transaction, SystemProgram, Connection } from "@solana/web3.js";
 
+const connection = new Connection("https://api.devnet.solana.com");
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
 app.post("/api/v1/website", authMiddleware, async (req, res) => {
-  const userId = req.userId!; //Gets current logged-in user's ID from middleware
+  const userId = req.userId!;
   const { url } = req.body;
 
   const data = await prismaClient.website.create({
@@ -25,7 +27,7 @@ app.post("/api/v1/website", authMiddleware, async (req, res) => {
 });
 
 app.get("/api/v1/website/status", authMiddleware, async (req, res) => {
-  const websiteId = req.query.websiteId! as unknown as string; //Converts it to a string (in case TypeScript infers wrong type)
+  const websiteId = req.query.websiteId! as unknown as string;
   const userId = req.userId;
 
   const data = await prismaClient.website.findFirst({
@@ -43,7 +45,7 @@ app.get("/api/v1/website/status", authMiddleware, async (req, res) => {
 });
 
 app.get("/api/v1/websites", authMiddleware, async (req, res) => {
-  const userId = req.userId;
+  const userId = req.userId!;
 
   const websites = await prismaClient.website.findMany({
     where: {
@@ -55,10 +57,12 @@ app.get("/api/v1/websites", authMiddleware, async (req, res) => {
     },
   });
 
-  res.json(websites);
+  res.json({
+    websites,
+  });
 });
 
-app.delete("/api/v1/website", authMiddleware, async (req, res) => {
+app.delete("/api/v1/website/", authMiddleware, async (req, res) => {
   const websiteId = req.body.websiteId;
   const userId = req.userId!;
 
@@ -73,8 +77,10 @@ app.delete("/api/v1/website", authMiddleware, async (req, res) => {
   });
 
   res.json({
-    message: "delete website successfully",
+    message: "Deleted website successfully",
   });
 });
+
+app.post("/api/v1/payout/:validatorId", async (req, res) => {});
 
 app.listen(8080);

@@ -7,8 +7,6 @@ import {
   Server,
   ArrowRight,
   Check,
-  Moon,
-  Sun,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
